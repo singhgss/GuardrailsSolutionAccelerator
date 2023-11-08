@@ -5,7 +5,7 @@ function Get-GSAAutomationVariable {
 
     Write-Verbose "Getting automation variable '$name'"
     # when running in an Azure Automation Account
-    If ($ENV:AZUREPS_HOST_ENVIRONMENT -eq 'AzureAutomation/') {
+    If ($ENV:AZUREPS_HOST_ENVIRONMENT -eq 'AzureAutomation/' -or $PSPrivateMetadata.JobId) {
         $value = Get-AutomationVariable -Name $name
         return $value
     }
