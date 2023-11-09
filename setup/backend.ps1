@@ -44,8 +44,17 @@ try {
 catch {
     throw "Critical: Failed to connect to Azure with the 'Connect-AzAccount' command and '-identity' (MSI) parameter; verify that Azure Automation identity is configured. Error message: $_"
 }
+
+try {
+    $RuntimeConfig = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name 'gsaConfigExportLatest' -AsPlainText -ErrorAction Stop | ConvertFrom-Json | Select-Object -Expand runtime
+    Set-AzContext -SubscriptionId $RuntimeConfig.subscriptionId
+}
+catch {
+    throw "Failed to retrieve config json with secret name gsaConfigExportLatest from KeyVault '$KeyVaultName'. Error message: $_"
+}
 $SubID = (Get-AzContext).Subscription.Id
 $tenantID = (Get-AzContext).Tenant.Id
+
 try {
     [String] $WorkspaceKey = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $GuardrailWorkspaceIDKeyName -AsPlainText -ErrorAction Stop
 }
